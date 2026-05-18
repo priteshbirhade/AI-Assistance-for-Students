@@ -1,14 +1,10 @@
-import warnings
-warnings.filterwarnings("ignore")
-
 import streamlit as st
-from transformers import pipeline
 from pypdf import PdfReader
 import re
 
-# ----------------------------
+# -----------------------------
 # PAGE CONFIG
-# ----------------------------
+# -----------------------------
 st.set_page_config(
     page_title="AI Study Assistant",
     layout="wide"
@@ -19,25 +15,9 @@ st.write(
     "Upload PDF notes and generate summaries, quizzes, and flashcards."
 )
 
-# ----------------------------
-# LOAD AI MODEL
-# ----------------------------
-@st.cache_resource
-def load_model():
-
-    summarizer = pipeline(
-        task="summarization",
-        model="sshleifer/distilbart-cnn-12-6",
-        device=-1
-    )
-
-    return summarizer
-
-summarizer = load_model()
-
-# ----------------------------
+# -----------------------------
 # PDF TEXT EXTRACTION
-# ----------------------------
+# -----------------------------
 def extract_text_from_pdf(pdf_file):
 
     reader = PdfReader(pdf_file)
@@ -53,35 +33,29 @@ def extract_text_from_pdf(pdf_file):
 
     return text
 
-# ----------------------------
+# -----------------------------
 # CLEAN TEXT
-# ----------------------------
+# -----------------------------
 def clean_text(text):
 
     text = re.sub(r'\s+', ' ', text)
 
     return text.strip()
 
-# ----------------------------
+# -----------------------------
 # GENERATE SUMMARY
-# ----------------------------
+# -----------------------------
 def generate_summary(text):
 
-    if len(text) > 3000:
-        text = text[:3000]
+    sentences = text.split('.')
 
-    summary = summarizer(
-        text,
-        max_length=150,
-        min_length=50,
-        do_sample=False
-    )
+    summary = '. '.join(sentences[:5])
 
-    return summary[0]["summary_text"]
+    return summary
 
-# ----------------------------
+# -----------------------------
 # GENERATE QUIZ
-# ----------------------------
+# -----------------------------
 def generate_quiz(text):
 
     sentences = text.split('.')
@@ -100,22 +74,24 @@ def generate_quiz(text):
 
     return questions
 
-# ----------------------------
+# -----------------------------
 # GENERATE FLASHCARDS
-# ----------------------------
+# -----------------------------
 def generate_flashcards(text):
 
     sentences = text.split('.')
 
     flashcards = []
 
-    for i, sentence in enumerate(sentences[:8]):
+    for sentence in sentences[:8]:
 
         sentence = sentence.strip()
 
         if len(sentence) > 30:
 
-            keyword = sentence.split()[0]
+            words = sentence.split()
+
+            keyword = words[0]
 
             flashcards.append({
                 "question": f"What is {keyword}?",
@@ -124,17 +100,17 @@ def generate_flashcards(text):
 
     return flashcards
 
-# ----------------------------
+# -----------------------------
 # FILE UPLOAD
-# ----------------------------
+# -----------------------------
 uploaded_file = st.file_uploader(
     "Upload PDF File",
     type=["pdf"]
 )
 
-# ----------------------------
+# -----------------------------
 # PROCESS FILE
-# ----------------------------
+# -----------------------------
 if uploaded_file:
 
     with st.spinner("Reading PDF..."):
@@ -145,7 +121,7 @@ if uploaded_file:
 
     st.success("PDF uploaded successfully!")
 
-    # Preview Section
+    # Preview
     st.subheader("📄 Extracted Text Preview")
 
     st.text_area(
@@ -162,9 +138,7 @@ if uploaded_file:
 
         if st.button("Generate Summary"):
 
-            with st.spinner("Generating summary..."):
-
-                summary = generate_summary(cleaned_text)
+            summary = generate_summary(cleaned_text)
 
             st.subheader("📝 Summary")
 
@@ -180,6 +154,7 @@ if uploaded_file:
             st.subheader("❓ Quiz Questions")
 
             for q in quiz:
+
                 st.write(q)
 
     # FLASHCARDS
@@ -203,11 +178,11 @@ if uploaded_file:
 
                 st.markdown("---")
 
-# ----------------------------
+# -----------------------------
 # FOOTER
-# ----------------------------
+# -----------------------------
 st.markdown("---")
 
 st.caption(
-    "Offline AI Study Assistant using HuggingFace + Streamlit"
+    "AI Study Assistant using Streamlit"
 )
