@@ -2,22 +2,19 @@ import streamlit as st
 from pypdf import PdfReader
 import re
 
-# -----------------------------
 # PAGE CONFIG
-# -----------------------------
 st.set_page_config(
     page_title="AI Study Assistant",
     layout="wide"
 )
 
 st.title("📘 AI Study Assistant")
+
 st.write(
     "Upload PDF notes and generate summaries, quizzes, and flashcards."
 )
 
-# -----------------------------
 # PDF TEXT EXTRACTION
-# -----------------------------
 def extract_text_from_pdf(pdf_file):
 
     reader = PdfReader(pdf_file)
@@ -33,32 +30,26 @@ def extract_text_from_pdf(pdf_file):
 
     return text
 
-# -----------------------------
 # CLEAN TEXT
-# -----------------------------
 def clean_text(text):
 
-    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r"\s+", " ", text)
 
     return text.strip()
 
-# -----------------------------
-# GENERATE SUMMARY
-# -----------------------------
+# SUMMARY
 def generate_summary(text):
 
-    sentences = text.split('.')
+    sentences = text.split(".")
 
-    summary = '. '.join(sentences[:5])
+    summary = ". ".join(sentences[:5])
 
     return summary
 
-# -----------------------------
-# GENERATE QUIZ
-# -----------------------------
+# QUIZ
 def generate_quiz(text):
 
-    sentences = text.split('.')
+    sentences = text.split(".")
 
     questions = []
 
@@ -69,17 +60,15 @@ def generate_quiz(text):
         if len(sentence) > 40:
 
             questions.append(
-                f"Q{i+1}: Explain:\n{sentence}?"
+                f"Q{i+1}: Explain this:\n{sentence}?"
             )
 
     return questions
 
-# -----------------------------
-# GENERATE FLASHCARDS
-# -----------------------------
+# FLASHCARDS
 def generate_flashcards(text):
 
-    sentences = text.split('.')
+    sentences = text.split(".")
 
     flashcards = []
 
@@ -100,18 +89,14 @@ def generate_flashcards(text):
 
     return flashcards
 
-# -----------------------------
 # FILE UPLOAD
-# -----------------------------
 uploaded_file = st.file_uploader(
     "Upload PDF File",
     type=["pdf"]
 )
 
-# -----------------------------
 # PROCESS FILE
-# -----------------------------
-if uploaded_file:
+if uploaded_file is not None:
 
     with st.spinner("Reading PDF..."):
 
@@ -121,7 +106,6 @@ if uploaded_file:
 
     st.success("PDF uploaded successfully!")
 
-    # Preview
     st.subheader("📄 Extracted Text Preview")
 
     st.text_area(
@@ -130,7 +114,6 @@ if uploaded_file:
         height=250
     )
 
-    # Buttons
     col1, col2, col3 = st.columns(3)
 
     # SUMMARY
@@ -178,11 +161,6 @@ if uploaded_file:
 
                 st.markdown("---")
 
-# -----------------------------
-# FOOTER
-# -----------------------------
 st.markdown("---")
 
-st.caption(
-    "AI Study Assistant using Streamlit"
-)
+st.caption("AI Study Assistant")
