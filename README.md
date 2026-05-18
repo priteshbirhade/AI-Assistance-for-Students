@@ -1,15 +1,40 @@
-# AI Study Assistant
+# 🏥 AI Healthcare Assistant
 
-A simple AI Study Assistant project using Streamlit and Python.
+AI Healthcare Assistant is a simple healthcare web application built using Python and Streamlit.
 
-## Features
+The application helps users:
+- Enter symptoms
+- Analyze possible health conditions
+- Get health recommendations
+- Generate a simple patient report
 
-- Upload PDF files
-- Generate summaries
-- Generate quiz questions
-- Generate flashcards
+---
 
-## Installation
+# 🚀 Features
 
-```bash
-pip install -r requirements.txt
+✅ Patient Information Form  
+✅ Symptom Analysis  
+✅ Basic Disease Prediction  
+✅ Health Recommendations  
+✅ User-Friendly Interface  
+✅ No API Key Required  
+✅ Beginner Friendly  
+✅ Deployable on Streamlit Cloud  
+
+---
+
+# 🛠️ Technologies Used
+
+- Python
+- Streamlit
+
+---
+
+# 📂 Project Structure
+
+```text
+AI_Healthcare_Assistant/
+│
+├── app.py
+├── requirements.txt
+├── README.md
