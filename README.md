@@ -1,16 +1,13 @@
 # AI Study Assistant
 
-An offline AI-powered study assistant built using Python and Streamlit.
+A simple AI Study Assistant project using Streamlit and Python.
 
 ## Features
 
-- PDF Upload
-- AI Summarization
-- Quiz Generation
-- Flashcards
-- No API Key Required
-
----
+- Upload PDF files
+- Generate summaries
+- Generate quiz questions
+- Generate flashcards
 
 ## Installation
 
