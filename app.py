@@ -1,197 +1,144 @@
 import streamlit as st
-import PyPDF2
 
-# ---------------------------------------------------
-# PAGE CONFIG
-# ---------------------------------------------------
+# --------------------------------------------------
+# PAGE CONFIGURATION
+# --------------------------------------------------
 st.set_page_config(
-    page_title="AI Study Assistant",
+    page_title="AI Healthcare Assistant",
     layout="wide"
 )
 
-# ---------------------------------------------------
+# --------------------------------------------------
 # TITLE
-# ---------------------------------------------------
-st.title("📘 AI Study Assistant")
+# --------------------------------------------------
+st.title("🏥 AI Healthcare Assistant")
 
 st.write(
-    "Upload your PDF notes and generate summaries, quizzes, and flashcards."
+    "This AI Healthcare Assistant helps analyze symptoms and provides basic health suggestions."
 )
 
-# ---------------------------------------------------
-# PDF TEXT EXTRACTION FUNCTION
-# ---------------------------------------------------
-def extract_text_from_pdf(uploaded_file):
+# --------------------------------------------------
+# PATIENT DETAILS
+# --------------------------------------------------
+st.subheader("👤 Patient Information")
 
-    pdf_reader = PyPDF2.PdfReader(uploaded_file)
+patient_name = st.text_input("Patient Name")
 
-    text = ""
+patient_age = st.number_input(
+    "Patient Age",
+    min_value=1,
+    max_value=120,
+    value=25
+)
 
-    for page in pdf_reader.pages:
+patient_gender = st.selectbox(
+    "Gender",
+    ["Male", "Female", "Other"]
+)
 
-        page_text = page.extract_text()
+# --------------------------------------------------
+# SYMPTOMS INPUT
+# --------------------------------------------------
+st.subheader("🩺 Enter Symptoms")
 
-        if page_text:
-            text += page_text + " "
+symptoms = st.text_area(
+    "Type symptoms separated by commas",
+    placeholder="Example: fever, cough, headache"
+)
 
-    return text
+# --------------------------------------------------
+# DISEASE PREDICTION FUNCTION
+# --------------------------------------------------
+def predict_disease(user_symptoms):
 
-# ---------------------------------------------------
-# SUMMARY FUNCTION
-# ---------------------------------------------------
-def generate_summary(text):
+    user_symptoms = user_symptoms.lower()
 
-    if len(text) > 1000:
-        summary = text[:1000]
+    if "fever" in user_symptoms and "cough" in user_symptoms:
+        return "Possible Flu or Viral Infection"
+
+    elif "headache" in user_symptoms and "vomiting" in user_symptoms:
+        return "Possible Migraine"
+
+    elif "chest pain" in user_symptoms:
+        return "Possible Heart-related Problem"
+
+    elif "stomach pain" in user_symptoms:
+        return "Possible Gastric Issue"
+
+    elif "cold" in user_symptoms:
+        return "Possible Common Cold"
+
+    elif "diabetes" in user_symptoms:
+        return "Possible Blood Sugar Issue"
+
     else:
-        summary = text
+        return "Symptoms unclear. Please consult a medical professional."
 
-    return summary
+# --------------------------------------------------
+# HEALTH RECOMMENDATION FUNCTION
+# --------------------------------------------------
+def health_recommendations():
 
-# ---------------------------------------------------
-# QUIZ FUNCTION
-# ---------------------------------------------------
-def generate_quiz(text):
+    recommendations = [
+        "Drink plenty of water",
+        "Take proper rest",
+        "Eat healthy food",
+        "Exercise regularly",
+        "Avoid junk food",
+        "Sleep at least 7-8 hours daily"
+    ]
 
-    sentences = text.split(".")
+    return recommendations
 
-    quiz_questions = []
+# --------------------------------------------------
+# ANALYZE BUTTON
+# --------------------------------------------------
+if st.button("Analyze Symptoms"):
 
-    count = 1
+    if symptoms.strip() == "":
 
-    for sentence in sentences:
+        st.warning("Please enter symptoms before analysis.")
 
-        sentence = sentence.strip()
+    else:
 
-        if len(sentence) > 30:
+        predicted_result = predict_disease(symptoms)
 
-            question = f"Q{count}: Explain this statement:\n{sentence}?"
+        st.success("Analysis Completed Successfully")
 
-            quiz_questions.append(question)
+        # --------------------------------------------------
+        # REPORT SECTION
+        # --------------------------------------------------
+        st.subheader("📋 Patient Report")
 
-            count += 1
+        st.write(f"👤 Patient Name: {patient_name}")
 
-        if count > 5:
-            break
+        st.write(f"🎂 Age: {patient_age}")
 
-    return quiz_questions
+        st.write(f"⚧ Gender: {patient_gender}")
 
-# ---------------------------------------------------
-# FLASHCARD FUNCTION
-# ---------------------------------------------------
-def generate_flashcards(text):
+        st.write(f"🩺 Symptoms: {symptoms}")
 
-    sentences = text.split(".")
+        # --------------------------------------------------
+        # PREDICTION RESULT
+        # --------------------------------------------------
+        st.subheader("🧠 AI Prediction")
 
-    flashcards = []
+        st.error(predicted_result)
 
-    count = 1
+        # --------------------------------------------------
+        # HEALTH TIPS
+        # --------------------------------------------------
+        st.subheader("💡 Health Recommendations")
 
-    for sentence in sentences:
+        tips = health_recommendations()
 
-        sentence = sentence.strip()
+        for tip in tips:
 
-        if len(sentence) > 30:
+            st.write(f"✅ {tip}")
 
-            words = sentence.split()
-
-            keyword = words[0]
-
-            flashcards.append({
-                "question": f"What is {keyword}?",
-                "answer": sentence
-            })
-
-            count += 1
-
-        if count > 5:
-            break
-
-    return flashcards
-
-# ---------------------------------------------------
-# FILE UPLOADER
-# ---------------------------------------------------
-uploaded_file = st.file_uploader(
-    "Upload PDF File",
-    type=["pdf"]
-)
-
-# ---------------------------------------------------
-# PROCESS PDF
-# ---------------------------------------------------
-if uploaded_file is not None:
-
-    with st.spinner("Reading PDF file..."):
-
-        pdf_text = extract_text_from_pdf(uploaded_file)
-
-    st.success("PDF uploaded successfully!")
-
-    # ---------------------------------------------------
-    # TEXT PREVIEW
-    # ---------------------------------------------------
-    st.subheader("📄 Extracted Text Preview")
-
-    st.text_area(
-        "Preview",
-        pdf_text[:2000],
-        height=250
-    )
-
-    # ---------------------------------------------------
-    # BUTTON SECTION
-    # ---------------------------------------------------
-    col1, col2, col3 = st.columns(3)
-
-    # SUMMARY BUTTON
-    with col1:
-
-        if st.button("Generate Summary"):
-
-            summary = generate_summary(pdf_text)
-
-            st.subheader("📝 Summary")
-
-            st.write(summary)
-
-    # QUIZ BUTTON
-    with col2:
-
-        if st.button("Generate Quiz"):
-
-            quiz = generate_quiz(pdf_text)
-
-            st.subheader("❓ Quiz Questions")
-
-            for question in quiz:
-
-                st.write(question)
-
-    # FLASHCARD BUTTON
-    with col3:
-
-        if st.button("Generate Flashcards"):
-
-            flashcards = generate_flashcards(pdf_text)
-
-            st.subheader("🧠 Flashcards")
-
-            for card in flashcards:
-
-                st.markdown(
-                    f"**Q:** {card['question']}"
-                )
-
-                st.write(
-                    f"A: {card['answer']}"
-                )
-
-                st.markdown("---")
-
-# ---------------------------------------------------
+# --------------------------------------------------
 # FOOTER
-# ---------------------------------------------------
+# --------------------------------------------------
 st.markdown("---")
 
-st.caption("AI Study Assistant using Streamlit + Python")
+st.caption("AI Healthcare Assistant using Python + Streamlit")
